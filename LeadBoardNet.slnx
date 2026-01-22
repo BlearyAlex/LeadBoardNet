@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
+  <Project Path="LeadBoard.Shared/LeadBoard.Shared.csproj" />
+  <Project Path="LeadBoardNet.API/LeadBoardNet.API.csproj" />
+</Solution>

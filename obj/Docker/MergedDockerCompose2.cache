@@ -1,0 +1,21 @@
+name: dockercompose3367519859335754874
+services:
+  leadboardnet:
+    build:
+      context: C:\Users\erick_ortiz\source\repos\LeadBoardNet
+      dockerfile: LeadBoardNet.API/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__DefaultConnection: Host=host.docker.internal;Port=5432;Database=LeadboardDb;Username=leadboard;Password=StrongPass123
+    image: leadboardnet
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "8080"
+        protocol: tcp
+networks:
+  default:
+    name: dockercompose3367519859335754874_default

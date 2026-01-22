@@ -1,0 +1,75 @@
+name: dockercompose3367519859335754874
+services:
+  leadboardnet:
+    build:
+      context: C:\Users\erick_ortiz\source\repos\LeadBoardNet
+      dockerfile: LeadBoardNet.API/Dockerfile
+      args:
+        BUILD_CONFIGURATION: Debug
+        LAUNCHING_FROM_VS: "true"
+      labels:
+        com.microsoft.created-by: visual-studio
+        com.microsoft.visual-studio.project-name: LeadBoardNet
+    entrypoint:
+      - dotnet
+      - --roll-forward
+      - Major
+      - /VSTools/DistrolessHelper/DistrolessHelper.dll
+      - --wait
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__DefaultConnection: Host=host.docker.internal;Port=5432;Database=LeadboardDb;Username=leadboard;Password=StrongPass123
+    image: leadboardnet
+    labels:
+      com.microsoft.visual-studio.project-name: LeadBoardNet
+      com.microsoft.visualstudio.debuggee.arguments: ' --additionalProbingPath /.nuget/packages --additionalProbingPath /.nuget/fallbackpackages  "/app/LeadBoardNet.dll"'
+      com.microsoft.visualstudio.debuggee.killprogram: dotnet --roll-forward Major /VSTools/DistrolessHelper/DistrolessHelper.dll --stop dotnet
+      com.microsoft.visualstudio.debuggee.program: dotnet
+      com.microsoft.visualstudio.debuggee.workingdirectory: /app
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "8080"
+        protocol: tcp
+    tty: true
+    volumes:
+      - type: bind
+        source: C:\Users\erick_ortiz\vsdbg\vs2017u5
+        target: /remote_debugger
+        bind: {}
+      - type: bind
+        source: C:\Users\erick_ortiz\AppData\Roaming\ASP.NET\Https
+        target: /root/.aspnet/https
+        read_only: true
+        bind: {}
+      - type: bind
+        source: C:\Users\erick_ortiz\AppData\Roaming\ASP.NET\Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind: {}
+      - type: bind
+        source: C:\Users\erick_ortiz\AppData\Roaming\Microsoft\UserSecrets
+        target: /root/.microsoft/usersecrets
+        read_only: true
+        bind: {}
+      - type: bind
+        source: C:\Users\erick_ortiz\AppData\Roaming\Microsoft\UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind: {}
+      - type: bind
+        source: C:\Program Files\Microsoft Visual Studio\18\Insiders\MSBuild\Sdks\Microsoft.Docker.Sdk\tools\linux-x64\net6.0
+        target: /VSTools
+        read_only: true
+        bind: {}
+      - type: bind
+        source: C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\extensions\Microsoft\managedprojectsystem\HotReload
+        target: /HotReloadAgent
+        read_only: true
+        bind: {}
+networks:
+  default:
+    name: dockercompose3367519859335754874_default

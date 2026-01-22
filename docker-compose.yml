@@ -1,0 +1,6 @@
+services:
+  leadboardnet:
+    image: ${DOCKER_REGISTRY-}leadboardnet
+    build:
+      context: .
+      dockerfile: LeadBoardNet.API/Dockerfile
