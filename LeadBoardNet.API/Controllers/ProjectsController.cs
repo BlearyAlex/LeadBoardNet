@@ -1,4 +1,6 @@
 ﻿using LeadBoard.Shared.Dtos.Request;
+using LeadBoard.Shared.Dtos.Response;
+using LeadBoard.Shared.Wrappers;
 using LeadBoardNet.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,7 +8,7 @@ namespace LeadBoardNet.API.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class ProjectsController : ControllerBase
+public class ProjectsController : ApiControllerBase
 {
     private readonly IProjectService _projectService;
 
@@ -17,20 +19,12 @@ public class ProjectsController : ControllerBase
 
     [HttpPost]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> Create(
+    public async Task<ActionResult<ApiResponse<ProjectResponseDto>>> Create(
         [FromForm] CreateProjectDto request,
         IFormFile? mainImage,
         List<IFormFile>? images)
     {
         var result = await _projectService.CreateAsync(request, mainImage, images);
-        
-        if (!result.IsSuccess)
-        {
-            return BadRequest(result.Error);
-        }
-        
-        var location = $"/api/projects/{result.Value.Id}";
-        
-        return Created(location, result.Value);
+        return HandleResult(result);
     }
 }

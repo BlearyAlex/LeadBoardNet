@@ -7,5 +7,5 @@ namespace LeadBoardNet.API.Services;
 
 public interface IProjectService
 {
-    Task<Result<ProjectResponseDto>> CreateAsync(CreateProjectDto request, IFormFile mainImage, List<IFormFile> images);
+    Task<Result<ProjectResponseDto>> CreateAsync(CreateProjectDto request, IFormFile? mainImage, List<IFormFile>? images);
 }

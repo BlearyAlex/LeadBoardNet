@@ -1,9 +1,10 @@
 ﻿using LeadBoard.Shared.Dtos.Response;
+using LeadBoard.Shared.Wrappers;
 
 namespace LeadBoardNet.API.Services;
 
 public interface ICloudinaryService
 {
-    Task<CloudinaryResponseDto> UploadAsync(IFormFile file);
-    Task DeleteAsync(String publicId);
+    Task<Result<CloudinaryResponseDto>> UploadAsync(IFormFile file);
+    Task<Result<bool>> DeleteAsync(string publicId);
 }

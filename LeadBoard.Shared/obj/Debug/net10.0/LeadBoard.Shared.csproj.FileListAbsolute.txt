@@ -9,3 +9,4 @@ C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoard.Shared\obj\Debug\net10.
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoard.Shared\obj\Debug\net10.0\refint\LeadBoard.Shared.dll
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoard.Shared\obj\Debug\net10.0\LeadBoard.Shared.pdb
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoard.Shared\obj\Debug\net10.0\ref\LeadBoard.Shared.dll
+C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoard.Shared\obj\Debug\net10.0\LeadBoard.Shared.sourcelink.json
