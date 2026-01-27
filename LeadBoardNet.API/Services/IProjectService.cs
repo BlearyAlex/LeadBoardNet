@@ -1,11 +1,12 @@
-﻿using LeadBoard.Shared.Dtos.Request;
-using LeadBoard.Shared.Dtos.Response;
-using LeadBoard.Shared.Entities;
+using LeadBoard.Shared.Dtos;
 using LeadBoard.Shared.Wrappers;
 
 namespace LeadBoardNet.API.Services;
 
 public interface IProjectService
 {
-    Task<Result<ProjectResponseDto>> CreateAsync(CreateProjectDto request, IFormFile? mainImage, List<IFormFile>? images);
+    Task<Result<ProjectResponse>> CreateAsync(ProjectRequest request, IFormFile? mainImage, List<IFormFile>? images);
+    Task<Result<ProjectResponse>> UpdateAsync(int id, ProjectRequest request, IFormFile? newMainImage);
+    Task<Result<bool>> DeleteAsync(int id);
+    Task<Result<bool>> DeleteGalleryImageAsync(int projectId, int imageId);
 }

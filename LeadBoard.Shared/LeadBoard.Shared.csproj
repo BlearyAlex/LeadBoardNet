@@ -7,7 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Folder Include="Dtos\Request\" />
       <Folder Include="Responses\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Exceptions.cs" />
     </ItemGroup>
 
 </Project>

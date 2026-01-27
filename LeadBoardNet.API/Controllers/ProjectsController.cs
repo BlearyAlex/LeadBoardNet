@@ -1,5 +1,4 @@
-﻿using LeadBoard.Shared.Dtos.Request;
-using LeadBoard.Shared.Dtos.Response;
+using LeadBoard.Shared.Dtos;
 using LeadBoard.Shared.Wrappers;
 using LeadBoardNet.API.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -19,8 +18,8 @@ public class ProjectsController : ApiControllerBase
 
     [HttpPost]
     [Consumes("multipart/form-data")]
-    public async Task<ActionResult<ApiResponse<ProjectResponseDto>>> Create(
-        [FromForm] CreateProjectDto request,
+    public async Task<ActionResult<ApiResponse<ProjectResponse>>> Create(
+        [FromForm] ProjectRequest request,
         IFormFile? mainImage,
         List<IFormFile>? images)
     {

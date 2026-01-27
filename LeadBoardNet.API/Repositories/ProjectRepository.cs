@@ -20,6 +20,13 @@ public class ProjectRepository : IProjectRepository
         return project;
     }
 
+    public async Task<Project> UpdateAsync(Project project)
+    {
+        _context.Projects.Update(project);
+        await _context.SaveChangesAsync();
+        return project;
+    }
+
     public async Task<Project?> GetByIdAsync(long id)
     {
         return await _context.Projects
@@ -27,9 +34,23 @@ public class ProjectRepository : IProjectRepository
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
+    public async Task<Project?> GetByIdWithGalleryAsync(long id)
+    {
+        return await _context.Projects
+            .Include(p => p.Gallery)
+            .Include(p => p.Tags)
+            .FirstOrDefaultAsync(p => p.Id == id); 
+    }
+
     public async Task<Project?> GetByTitleAsync(string title)
     {
         return await _context.Projects
             .FirstOrDefaultAsync(p => EF.Functions.Like(p.Title, title));
+    }
+
+    public async Task DeleteAsync(Project project)
+    {
+        _context.Projects.Remove(project);
+        await _context.SaveChangesAsync();
     }
 }

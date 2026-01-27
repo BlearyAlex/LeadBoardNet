@@ -1,6 +1,6 @@
-ï»¿using AutoMapper;
-using LeadBoard.Shared.Dtos.Request;
-using LeadBoard.Shared.Dtos.Response;
+using AutoMapper;
+using FluentValidation;
+using LeadBoard.Shared.Dtos;
 using LeadBoard.Shared.Entities;
 using LeadBoard.Shared.Wrappers;
 using LeadBoardNet.API.Repositories;
@@ -12,155 +12,189 @@ public class ProjectService : IProjectService
     private readonly IProjectRepository _projectRepository;
     private readonly ILogger<ProjectService> _logger;
     private readonly IMapper _mapper;
-    private readonly ICloudinaryService _cloudinaryService;
+    private readonly IValidator<ProjectRequest> _validator;
+    private readonly IImageManager _imageManager;
 
-    public ProjectService(IProjectRepository projectRepository, ILogger<ProjectService> logger, IMapper mapper,
-        ICloudinaryService cloudinaryService)
+    public ProjectService(
+        IProjectRepository projectRepository,
+        ILogger<ProjectService> logger,
+        IMapper mapper,
+        IValidator<ProjectRequest> validator,
+        IImageManager imageManager)
     {
         _projectRepository = projectRepository;
         _logger = logger;
         _mapper = mapper;
-        _cloudinaryService = cloudinaryService;
+        _validator = validator;
+        _imageManager = imageManager;
     }
 
-    public async Task<Result<ProjectResponseDto>> CreateAsync(CreateProjectDto request, IFormFile? mainImage,
+    public async Task<Result<ProjectResponse>> CreateAsync(ProjectRequest request, IFormFile? mainImage,
         List<IFormFile>? images)
     {
-        _logger.LogInformation("Creando nuevo proyecto: {Title}", request.Title);
-
-        var existingProject = await _projectRepository.GetByTitleAsync(request.Title);
-        if (existingProject != null)
+        var validationResult = await _validator.ValidateAsync(request);
+        if (!validationResult.IsValid)
         {
-            return Result<ProjectResponseDto>.Conflict(
-                $"Ya existe un proyecto con el titulo '{request.Title}'"
-            );
+            var erros = validationResult.Errors.Select(e => e.ErrorMessage);
+            return Result<ProjectResponse>.BadRequest(string.Join(", ", erros));
         }
+
+        if (await _projectRepository.GetByTitleAsync(request.Title) != null)
+            return Result<ProjectResponse>.Conflict("El titulo ya existe");
 
         var project = _mapper.Map<Project>(request);
 
-        if (mainImage != null)
-        {
-            var uploadResult = await _cloudinaryService.UploadAsync(mainImage);
-
-            if (!uploadResult.IsSuccess)
-            {
-                return Result<ProjectResponseDto>.Failure(
-                    uploadResult.Error,
-                    uploadResult.StatusCode
-                );
-            }
-
-            project.MainImageUrl = uploadResult.Value!.Url;
-            project.MainImagePublicId = uploadResult.Value.PublicId;
-        }
-
-        if (images != null && images.Any())
-        {
-            var galleryResult = await UploadGalleryImagesAsync(images, project);
-
-            if (!galleryResult.IsSuccess)
-            {
-                // Rollback de imagen principal
-                if (!string.IsNullOrEmpty(project.MainImagePublicId))
-                {
-                    await _cloudinaryService.DeleteAsync(project.MainImagePublicId);
-                }
-
-                return Result<ProjectResponseDto>.Failure(
-                    galleryResult.Error,
-                    galleryResult.StatusCode
-                );
-            }
-
-            project.Gallery = galleryResult.Value;
-        }
+        string? mainPublicId = null;
+        List<string> galleryPublicIds = new();
 
         try
         {
-            var savedProject = await _projectRepository.CreateAsync(project);
+            if (mainImage != null)
+            {
+                var main = await _imageManager.UploadSingleAsync(mainImage);
+                project.MainImageUrl = main.Url;
+                project.MainImagePublicId = main.PublicId;
+                mainPublicId = main.PublicId;
+            }
 
-            _logger.LogInformation("Proyecto creado exitosamente: {ProjectId}", savedProject.Id);
+            if (images?.Any() == true)
+            {
+                var galleryResults = await _imageManager.UploadMultipleAsync(images);
+                galleryPublicIds = galleryResults.Select(x => x.PublicId).ToList();
 
-            var responseDto = _mapper.Map<ProjectResponseDto>(savedProject);
-            return Result<ProjectResponseDto>.Success(responseDto);
+                project.Gallery = galleryResults.Select(x => new ProjectImage
+                {
+                    Url = x.Url,
+                    PublicId = x.PublicId,
+                    Project = project
+                }).ToList();
+            }
+
+            var createdProject = await _projectRepository.CreateAsync(project);
+
+            var response = _mapper.Map<ProjectResponse>(createdProject);
+            return Result<ProjectResponse>.Success(response);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error al guardar proyecto en BD. Realizando rollback de imÃ¡genes");
+            _logger.LogError(ex, "Error crítico al crear el proyecto. Iniciando rollback de imágenes.");
 
-            await RollbackImagesAsync(project.MainImagePublicId, project.Gallery);
+            // 6. EL MOMENTO DE LA VERDAD: Rollback
+            // Si falló el guardado en DB o cualquier cosa, borramos de Cloudinary
+            await _imageManager.RollbackAsync(mainPublicId, galleryPublicIds);
 
-            // Dejar que el middleware maneje esto
+            // Re-lanzamos para que el Middleware se encargue de la respuesta HTTP
             throw;
         }
     }
 
-    private async Task<Result<List<ProjectImage>>> UploadGalleryImagesAsync(List<IFormFile> images, Project project)
+    public async Task<Result<ProjectResponse>> UpdateAsync(int id, ProjectRequest request,
+        IFormFile? newMainImage)
     {
-        var gallery = new List<ProjectImage>();
-        var uploadedPublicIds = new List<string>();
+        var project = await _projectRepository.GetByIdAsync(id);
+        if (project == null) return Result<ProjectResponse>.NotFound("Proyecto no encontrado");
 
-        foreach (var file in images)
+        // Guardamos el ID viejo para borrarlo DESPUÉS del éxito
+        string? oldMainPublicId = null;
+        string? newMainPublicId = null;
+
+        try
         {
-            var result = await _cloudinaryService.UploadAsync(file);
+            _mapper.Map(request, project);
 
-            if (!result.IsSuccess)
+            if (newMainImage != null)
             {
-                await RollbackGalleryImagesAsync(uploadedPublicIds);
+                var uploadResult = await _imageManager.UploadSingleAsync(newMainImage);
 
-                return Result<List<ProjectImage>>.Failure(
-                    $"Error al subir imagen de galerÃ­a: {result.Error}",
-                    result.StatusCode
-                );
+                // Guardamos el ID de la vieja para borrarla luego
+                oldMainPublicId = project.MainImagePublicId;
+
+                // Actualizamos la entidad con la nueva info
+                project.MainImageUrl = uploadResult.Url;
+                project.MainImagePublicId = uploadResult.PublicId;
+
+                // Guardamos el ID de la nueva por si hay que hacer rollback
+                newMainPublicId = uploadResult.PublicId;
             }
 
-            var image = new ProjectImage
+            await _projectRepository.UpdateAsync(project);
+
+            if (!string.IsNullOrEmpty(oldMainPublicId))
             {
-                Url = result.Value!.Url,
-                PublicId = result.Value.PublicId,
-                ProjectId = project.Id
-            };
+                await _imageManager.DeleteAsync(oldMainPublicId);
+            }
 
-            gallery.Add(image);
-            uploadedPublicIds.Add(image.PublicId);
+            return Result<ProjectResponse>.Success(_mapper.Map<ProjectResponse>(project));
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al actualizar proyecto {Id}. Limpiando basura.", id);
 
-        return Result<List<ProjectImage>>.Success(gallery);
+            // ROLLBACK: Si alcanzamos a subir una imagen nueva pero la DB falló, la borramos
+            if (!string.IsNullOrEmpty(newMainPublicId))
+            {
+                await _imageManager.RollbackAsync(newMainPublicId);
+            }
+
+            throw; // Al middleware
+        }
     }
 
-    private async Task RollbackGalleryImagesAsync(List<string> publicIds)
+    public async Task<Result<bool>> DeleteAsync(int id)
     {
-        foreach (var publicId in publicIds)
+        // 1. Obtener el proyecto con TODO su grafo (Main Image + Gallery)
+        var project = await _projectRepository.GetByIdWithGalleryAsync(id);
+        if (project == null) return Result<bool>.NotFound("Proyecto no encontrado");
+
+        // 2. Recolectar todos los PublicIds para la limpieza posterior
+        var publicIdsToDelete = new List<string>();
+
+        if (!string.IsNullOrEmpty(project.MainImagePublicId))
+            publicIdsToDelete.Add(project.MainImagePublicId);
+
+        if (project.Gallery?.Any() == true)
+            publicIdsToDelete.AddRange(project.Gallery.Select(x => x.PublicId));
+
+        try
         {
-            try
-            {
-                await _cloudinaryService.DeleteAsync(publicId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "No se pudo eliminar imagen en rollback: {PublicId}", publicId);
-            }
+            // 3. Eliminar de la Base de Datos primero
+            // Al borrar el Proyecto, EF borrará en cascada los Tags y registros de Galería
+            await _projectRepository.DeleteAsync(project);
+
+            // 4. Si la DB fue exitosa, procedemos a limpiar Cloudinary
+            // Usamos RollbackAsync porque ya tiene la lógica de borrar múltiples IDs en paralelo
+            await _imageManager.RollbackAsync(null, publicIdsToDelete);
+
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error crítico al eliminar el proyecto {Id}", id);
+            throw; // Al Middleware
         }
     }
 
-    private async Task RollbackImagesAsync(string? mainImagePublicId, IEnumerable<ProjectImage>? gallery)
+    public async Task<Result<bool>> DeleteGalleryImageAsync(int projectId, int imageId)
     {
-        if (!string.IsNullOrEmpty(mainImagePublicId))
-        {
-            try
-            {
-                await _cloudinaryService.DeleteAsync(mainImagePublicId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "No se pudo eliminar imagen principal en rollback");
-            }
-        }
+        var project = await _projectRepository.GetByIdWithGalleryAsync(projectId);
+        if (project == null) return Result<bool>.NotFound("Proyecto no encontrado");
 
-        if (gallery != null && gallery.Any())
+        var image = project.Gallery.FirstOrDefault(x => x.Id == imageId);
+        if (image == null) return Result<bool>.NotFound("La imagen no pertenece a este proyecto");
+
+        try
         {
-            var publicIds = gallery.Select(g => g.PublicId).ToList();
-            await RollbackGalleryImagesAsync(publicIds);
+            await _imageManager.DeleteAsync(image.PublicId);
+
+            project.Gallery.Remove(image);
+            await _projectRepository.UpdateAsync(project);
+
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al eliminar imagen {ImageId} del proyecto {ProjectId}", imageId, projectId);
+            throw; // Al Middleware
         }
     }
 }

@@ -6,6 +6,11 @@ C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\LeadBoardNet.API.runtimeconfig.json
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\LeadBoardNet.API.dll
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\LeadBoardNet.API.pdb
+C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\AutoMapper.dll
+C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\CloudinaryDotNet.dll
+C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\FluentValidation.dll
+C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\FluentValidation.DependencyInjectionExtensions.dll
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\Humanizer.dll
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\Microsoft.Build.Framework.dll
@@ -107,6 +112,7 @@ C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\obj\Debug\net10.
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\obj\Debug\net10.0\LeadBoardNet.API.csproj.CoreCompileInputs.cache
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\obj\Debug\net10.0\LeadBoardNet.API.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\obj\Debug\net10.0\LeadBoardNet.API.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\obj\Debug\net10.0\LeadBoardNet.API.sourcelink.json
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\obj\Debug\net10.0\rjimswa.dswa.cache.json
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
@@ -122,11 +128,3 @@ C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\obj\Debug\net10.
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\obj\Debug\net10.0\LeadBoardNet.API.pdb
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\obj\Debug\net10.0\LeadBoardNet.API.genruntimeconfig.cache
 C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\obj\Debug\net10.0\ref\LeadBoardNet.API.dll
-C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\AutoMapper.dll
-C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
-C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\CloudinaryDotNet.dll
-C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\Microsoft.IdentityModel.Abstractions.dll
-C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\Microsoft.IdentityModel.JsonWebTokens.dll
-C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\Microsoft.IdentityModel.Logging.dll
-C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\bin\Debug\net10.0\Microsoft.IdentityModel.Tokens.dll
-C:\Users\erick_ortiz\source\repos\LeadBoardNet\LeadBoardNet.API\obj\Debug\net10.0\LeadBoardNet.API.sourcelink.json

@@ -1,9 +1,9 @@
 ﻿using System.Data.Common;
 using System.Net;
 using System.Text.Json;
+using LeadBoard.Shared;
 using LeadBoard.Shared.Wrappers;
 using Microsoft.EntityFrameworkCore;
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace LeadBoardNet.API.Middlewares;
 
@@ -11,9 +11,9 @@ public class ExceptionMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionMiddleware> _logger;
-    private readonly IHostingEnvironment _env;
+    private readonly IWebHostEnvironment _env;
 
-    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IHostingEnvironment env)
+    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IWebHostEnvironment env)
     {
         _next = next;
         _logger = logger;
@@ -98,6 +98,12 @@ public class ExceptionMiddleware
             UnauthorizedAccessException => (
                 HttpStatusCode.Unauthorized,
                 "No tiene permisos para realizar esta acción"
+            ),
+
+            // Errores de subida de imagenes
+            ImageUploadException imgEx => (
+                imgEx.StatusCode,
+                $"Error en la gestión de imágenes: {imgEx.Message}"
             ),
 
             // Catch-all para errores inesperados
