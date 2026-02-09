@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LeadBoardNet.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+79fd2bdfbf2799dfc71366305cdba909cea2a54b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+79772f372aeeefc0a7dca50fcedfb4155b6557d1")]
 [assembly: System.Reflection.AssemblyProductAttribute("LeadBoardNet.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LeadBoardNet.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using LeadBoard.Shared.Dtos.Settings.Projects;
 
 namespace LeadBoardNet.API.Validations;
 
@@ -44,7 +45,7 @@ public class ProjectRequestValidator : AbstractValidator<ProjectRequest>
         new[] { "Residencial", "Comercial", "Remodelación", "Industrial", "Institucional" }
             .Contains(category);
     
-    private bool BeValidTag(TagDto tag)
+    private bool BeValidTag(TagResponse tag)
     {
         // Aquí tu lógica de validación para cada tag
         return !string.IsNullOrEmpty(tag.Value) && tag.Value.Length <= 50;

@@ -1,6 +1,6 @@
 using AutoMapper;
-using LeadBoard.Shared.Dtos;
-using LeadBoard.Shared.Dtos.Settings;
+using LeadBoard.Shared.Dtos.Settings.Images;
+using LeadBoard.Shared.Dtos.Settings.Projects;
 using LeadBoard.Shared.Entities;
 
 namespace LeadBoardNet.API.Mapper;
@@ -9,9 +9,9 @@ public class ProjectMappingProfile : Profile
 {
     public ProjectMappingProfile()
     {
-        CreateMap<TagDto, ProjectTag>();
-        CreateMap<ProjectTag, TagDto>();
-        CreateMap<ProjectImage, ImageDetails>();
+        CreateMap<TagResponse, ProjectTag>();
+        CreateMap<ProjectTag, TagResponse>();
+        CreateMap<ProjectImage, ImageDetailsResponse>();
 
         CreateMap<ProjectRequest, Project>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())

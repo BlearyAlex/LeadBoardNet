@@ -1,6 +1,7 @@
 ﻿using LeadBoard.Shared;
 using LeadBoard.Shared.Dtos.Response;
 using LeadBoard.Shared.Dtos.Settings;
+using LeadBoard.Shared.Dtos.Settings.Images;
 
 namespace LeadBoardNet.API.Services;
 
@@ -15,7 +16,7 @@ public class ImageManager : IImageManager
         _logger = logger;
     }
 
-    public async Task<ImageDetailsSummary> UploadSingleAsync(IFormFile file)
+    public async Task<ImageDetailsSummaryResponse> UploadSingleAsync(IFormFile file)
     {
         var result = await _cloudinaryService.UploadAsync(file);
         if (!result.IsSuccess)
@@ -24,12 +25,12 @@ public class ImageManager : IImageManager
             throw new ImageUploadException(result.Error ?? "Error desconocido", result.StatusCode);
         }
 
-        return new ImageDetailsSummary(result.Value!.Url, result.Value.PublicId);
+        return new ImageDetailsSummaryResponse(result.Value!.Url, result.Value.PublicId);
     }
 
-    public async Task<List<ImageDetailsSummary>> UploadMultipleAsync(IEnumerable<IFormFile> files)
+    public async Task<List<ImageDetailsSummaryResponse>> UploadMultipleAsync(IEnumerable<IFormFile> files)
     {
-        var uploaded = new List<ImageDetailsSummary>();
+        var uploaded = new List<ImageDetailsSummaryResponse>();
         try
         {
             foreach (var file in files)

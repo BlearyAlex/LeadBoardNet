@@ -1,4 +1,4 @@
-using LeadBoard.Shared.Dtos;
+using LeadBoard.Shared.Dtos.Settings.Projects;
 using LeadBoard.Shared.Wrappers;
 using LeadBoardNet.API.Services;
 using Microsoft.AspNetCore.Mvc;

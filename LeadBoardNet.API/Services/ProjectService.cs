@@ -1,6 +1,6 @@
 using AutoMapper;
 using FluentValidation;
-using LeadBoard.Shared.Dtos;
+using LeadBoard.Shared.Dtos.Settings.Projects;
 using LeadBoard.Shared.Entities;
 using LeadBoard.Shared.Wrappers;
 using LeadBoardNet.API.Repositories;
@@ -77,10 +77,10 @@ public class ProjectService : IProjectService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error crítico al crear el proyecto. Iniciando rollback de imágenes.");
+            _logger.LogError(ex, "Error crï¿½tico al crear el proyecto. Iniciando rollback de imï¿½genes.");
 
             // 6. EL MOMENTO DE LA VERDAD: Rollback
-            // Si falló el guardado en DB o cualquier cosa, borramos de Cloudinary
+            // Si fallï¿½ el guardado en DB o cualquier cosa, borramos de Cloudinary
             await _imageManager.RollbackAsync(mainPublicId, galleryPublicIds);
 
             // Re-lanzamos para que el Middleware se encargue de la respuesta HTTP
@@ -94,7 +94,7 @@ public class ProjectService : IProjectService
         var project = await _projectRepository.GetByIdAsync(id);
         if (project == null) return Result<ProjectResponse>.NotFound("Proyecto no encontrado");
 
-        // Guardamos el ID viejo para borrarlo DESPUÉS del éxito
+        // Guardamos el ID viejo para borrarlo DESPUï¿½S del ï¿½xito
         string? oldMainPublicId = null;
         string? newMainPublicId = null;
 
@@ -130,7 +130,7 @@ public class ProjectService : IProjectService
         {
             _logger.LogError(ex, "Error al actualizar proyecto {Id}. Limpiando basura.", id);
 
-            // ROLLBACK: Si alcanzamos a subir una imagen nueva pero la DB falló, la borramos
+            // ROLLBACK: Si alcanzamos a subir una imagen nueva pero la DB fallï¿½, la borramos
             if (!string.IsNullOrEmpty(newMainPublicId))
             {
                 await _imageManager.RollbackAsync(newMainPublicId);
@@ -158,18 +158,18 @@ public class ProjectService : IProjectService
         try
         {
             // 3. Eliminar de la Base de Datos primero
-            // Al borrar el Proyecto, EF borrará en cascada los Tags y registros de Galería
+            // Al borrar el Proyecto, EF borrarï¿½ en cascada los Tags y registros de Galerï¿½a
             await _projectRepository.DeleteAsync(project);
 
             // 4. Si la DB fue exitosa, procedemos a limpiar Cloudinary
-            // Usamos RollbackAsync porque ya tiene la lógica de borrar múltiples IDs en paralelo
+            // Usamos RollbackAsync porque ya tiene la lï¿½gica de borrar mï¿½ltiples IDs en paralelo
             await _imageManager.RollbackAsync(null, publicIdsToDelete);
 
             return Result<bool>.Success(true);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error crítico al eliminar el proyecto {Id}", id);
+            _logger.LogError(ex, "Error crï¿½tico al eliminar el proyecto {Id}", id);
             throw; // Al Middleware
         }
     }
